@@ -25,6 +25,7 @@ class AuthService:
             email=user_data.email,
             username=user_data.username,
             full_name=user_data.full_name,
+            role=user_data.role,
             hashed_password=hashed_password
         )
         
