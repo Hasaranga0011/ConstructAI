@@ -7,6 +7,8 @@ class UserRoleEnum(str, Enum):
     ADMIN = "admin"
     PROJECT_MANAGER = "project_manager"
     SITE_ENGINEER = "site_engineer"
+    WORKER = "worker"
+    PROCUREMENT_TEAM = "procurement_team"
 
 class UserBase(BaseModel):
     email: EmailStr

@@ -10,13 +10,13 @@ class AuthService:
     
     @staticmethod
     def register_user(db: Session, user_data: UserCreate):
-        """Register a new user"""
-        # Check if email already exists
+        """Register a new user - one account per email only"""
+        # Check if email already exists (UNIQUE CONSTRAINT)
         existing_email = db.query(User).filter(User.email == user_data.email).first()
         if existing_email:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already registered"
+                detail="This email is already registered. Please login or use a different email."
             )
         
         # Check if username already exists
@@ -24,7 +24,7 @@ class AuthService:
         if existing_username:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username already taken"
+                detail="This username is already taken. Please choose a different username."
             )
         
         # Create new user
@@ -110,6 +110,7 @@ class AuthService:
     def request_password_reset(db: Session, email: str):
         """Request password reset - send email with reset link"""
         from app.core.security import create_password_reset_token
+        from app.services.email_service import EmailService
         
         user = db.query(User).filter(User.email == email).first()
         
@@ -120,12 +121,20 @@ class AuthService:
         # Generate reset token
         reset_token = create_password_reset_token(email)
         
-        # TODO: Send email with reset token
-        # For now, just return the token (in production, send via email)
-        return {
-            "message": "Password reset link sent to your email",
-            "reset_token": reset_token  # Remove in production!
-        }
+        # Send email with reset token
+        try:
+            EmailService.send_reset_password_email(email, reset_token)
+            return {
+                "message": "Password reset link sent to your email",
+                "success": True
+            }
+        except Exception as e:
+            print(f"❌ Error sending email: {str(e)}")
+            # Still return success message for security (don't reveal email sending failed)
+            return {
+                "message": "If email exists, reset link has been sent",
+                "success": True
+            }
     
     @staticmethod
     def reset_password(db: Session, token: str, new_password: str):

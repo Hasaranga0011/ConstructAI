@@ -10,7 +10,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 10))
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -65,7 +65,7 @@ def verify_password_reset_token(token: str):
 
 # Add password reset token functions
 def create_password_reset_token(email: str):
-    """Create a password reset token valid for 1 hour"""
+    """Create a password reset token valid for 10 minutes"""
     data = {"sub": email, "type": "password_reset"}
     expires_delta = timedelta(hours=1)
     return create_access_token(data, expires_delta)

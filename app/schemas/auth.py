@@ -14,6 +14,7 @@ class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
 class PasswordResetRequest(BaseModel):
+    email: EmailStr
     token: str
     new_password: str = Field(..., min_length=8)
     confirm_password: str = Field(..., min_length=8)
